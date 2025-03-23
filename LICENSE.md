@@ -27,7 +27,7 @@ SOFTWARE.
 
 ```
 
-## Python test scripts
+## Python Test Scripts
 
 ```
 The MIT License (MIT)
