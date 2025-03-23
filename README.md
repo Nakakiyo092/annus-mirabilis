@@ -51,5 +51,5 @@ Use STM32CubeIDE 1.18.0 or later.
 ## How to upgrade firmware
 Use the upgrade tool in the root repository.
 
-NOTE: After flashing this firmware, there would be an issue with the upgrade tool.
+NOTE: After flashing this firmware, there would be an issue upgrading to another firmware.
 You should manually send `X[CR]` command before upgrade or you should force upgrade mode by shorting DIO and GND as described in the root repository.
