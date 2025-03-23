@@ -63,6 +63,9 @@ Distribution) license.
 Code from the STM32 USB library is licensed under ST Micro's [Liberty V2
 License](http://www.st.com/software_license_agreement_liberty_v2)
 
+## Arm CMSIS
+
+Licensed under the Apache License, Version 2.0 ([the License](www.apache.org/licenses/LICENSE-2.0))
 
 ## printf implementation from @mpaland
 
