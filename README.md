@@ -35,15 +35,7 @@
 
 `[CR]` : `0x0D` (hex), `\r` (ascii)
 
-NOTE: The CANFD message length is as follows (in hex):
-- `0-8` : Same as standard CAN
-- `9` : length = 12
-- `A` : length = 16
-- `B` : length = 20
-- `C` : length = 24
-- `D` : length = 32
-- `E` : length = 48
-- `F` : length = 64
+Please find more information in the `doc` directory or [wiki](https://github.com/Nakakiyo092/usb2canfdv1/wiki).
 
 ## How to compile firmware
 Use STM32CubeIDE 1.18.0 or later.
@@ -52,4 +44,4 @@ Use STM32CubeIDE 1.18.0 or later.
 Use the upgrade tool in the root repository.
 
 NOTE: After flashing this firmware, there would be an issue upgrading to another firmware.
-You should manually send `X[CR]` command before upgrade or you should force upgrade mode by shorting DIO and GND as described in the root repository.
+You should manually send `X[CR]` command before upgrade or force upgrade mode by shorting DIO and GND as described in the root repository.
