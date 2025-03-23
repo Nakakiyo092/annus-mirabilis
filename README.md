@@ -2,7 +2,7 @@
 
 ## SLCAN Protocol Description
 
-> Using the virtual serial, the command is as follows:
+Using the virtual serial, the command is as follows:
 - `O[CR]` - Opens the CAN channel
 - `C[CR]` - Close the CAN channel
 - `S0[CR]` - Set the nominal bit rate to 10k
