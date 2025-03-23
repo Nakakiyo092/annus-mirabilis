@@ -1,17 +1,6 @@
-* [中文版本](./README_zh.md)
 # WeActStudio.USB2CANFDV1
-![display](Images/1.png)
-STM32G0B1CBT6  
-> 64Mhz Max,128KB RAM,128KB ROM
-
-CANFD/CAN2.0  
-> 1500V isolation, 5Mbps Max, support cangaroo or secondary development. Transceiver part number: SIT1051A&sitcores
-
-Connector  
-> 3.81mm 1x3P WJ15EDGK-3.81-3P
 
 ## SLCAN Protocol Description
-> Please upgrade to the latest firmware version to support more baud rates
 
 > Using the virtual serial, the command is as follows:
 - `O[CR]` - Opens the CAN channel
@@ -25,24 +14,14 @@ Connector
 - `S6[CR]` - Set the nominal bit rate to 500k
 - `S7[CR]` - Set the nominal bit rate to 800k
 - `S8[CR]` - Set the nominal bit rate to 1M
-- `S9[CR]` - Set the nominal bit rate to 83.3k
-- `SA[CR]` - Set the nominal bit rate to 75k
-- `SB[CR]` - Set the nominal bit rate to 62.5k
-- `SC[CR]` - Set the nominal bit rate to 33.3k
-- `SD[CR]` - Set the nominal bit rate to 5k
-- `Sxxyy[CR]` - Custom nominal bit rate (60/2=30Mhz CAN clock) [xx=seg1(hex,0x02\~0xff), yy=seg2(hex,0x02\~0x80)]
-- `Sddxxyy[CR]` - Custom nominal bit rate ([60/div]Mhz CAN clock) [dd=div(hex,0x01\~0xff), xx=seg1(hex,0x02\~0xff), yy=seg2(hex,0x02\~0x80)]
+- `sddxxyyzz[CR]` - Custom nominal bit rate (60Mhz CAN clock)
+- `Y0[CR]` - Set the CANFD data segment bit rate to 500k
 - `Y1[CR]` - Set the CANFD data segment bit rate to 1M
 - `Y2[CR]` - Set CANFD data segment bit rate to 2M (default)
 - `Y3[CR]` - Set the CANFD data segment bit rate to 3M
 - `Y4[CR]` - Set the CANFD data segment bit rate to 4M
 - `Y5[CR]` - Set the CANFD data segment bit rate to 5M
-- `Yxxyy[CR]` - Custom CANFD data segment bit rate (60Mhz CAN clock) [xx=seg1(hex,0x01\~0x20), yy=seg2(hex,0x01\~0x10)]
-- `Yddxxyy[CR]` - Custom CANFD data segment bit rate ([60/div]Mhz CAN clock) [dd=div(hex,0x01\~0x20), xx=seg1(hex,0x01\~0x20), yy=seg2(hex,0x01\~0x10)]
-- `M0[CR]` - Set to normal mode (default)
-- `M1[CR]` - Set to silent mode
-- `A0[CR]` - Turn off automatic retransmission (default)
-- `A1[CR]` - Enable automatic retransmission (not recommended, may crash)
+- `yddxxyyzz[CR]` - Custom CANFD data segment bit rate (60Mhz CAN clock)
 - `tIIILDD...[CR] `- Transfer data frame (standard ID) [ID, length, data]
 - `TIIIIIIIILDD...[CR] `- Transfer data frame (extended ID) [ID, length, data]
 - `rIIIL[CR]` - Transfer remote frame (standard ID) [ID, length]
@@ -52,17 +31,11 @@ Connector
 - `bIIILDD...[CR] `- Transmit CANFD standard frames (BRS enabled) [ID, length, data]
 - `BIIIIIIIILDD...[CR] `- Transmit CANFD extended frames (BRS enable) [ID, length, data]
 - `V[CR]` - Reads the firmware version
-- `E[CR]` - Read the failure state
 - `X[CR]` - Enter firmware upgrade mode
 
 `[CR]` : `0x0D` (hex), `\r` (ascii)
 
-**A status statement is returned after the command is sent**
-- [CR]: transmission successful
-- 0x07: transmission failed
-
-**Note**  
-The CANFD message length is as follows (in hex):
+NOTE: The CANFD message length is as follows (in hex):
 - `0-8` : Same as standard CAN
 - `9` : length = 12
 - `A` : length = 16
@@ -72,60 +45,11 @@ The CANFD message length is as follows (in hex):
 - `E` : length = 48
 - `F` : length = 64
 
-**cangaroo is located in `Tools/cangaroo`**  
-**The documentation for calculating custom Bitrate Settings is located in `Doc/CAN Bitrate Calculate_波特率计算.xlsx`**
-
-## Pin Description
-| pin | definition | specification |
-|:--:|:--:| :--:|
-|PA0|LED_RXD| Receive indicator, flashing when there is data |
-|PA1|LED_TXD| Send indicator light, flashing when there is data |
-|PA2|LED_READY| Status indicator, flashing 0.5S when the CAN port is opened and 1S when is in upgrade mode |
-|PB9|FDCAN1_TX|FDCAN1 tx |
-|PB8|FDCAN1_RX|FDCAN1 rx |
-|PA12|USB_DP|USB 2.0 12Mbps|
-|PA11|USB_DM|USB 2.0 12Mbps|
-|PF0|OSC_IN|16Mhz XTAL|
-|PF1|OSC_OUT|16Mhz XTAL|
-
-## Partitioning Notes
-| Start address | Partition name | Size | Description |
-| :-: | :-: | :-: | :-: |
-|0x08000000|bootloader|26 kbyte| bootloader, character watermark: USB2CANV1|
-|0x08006800|app|50 kbyte| application |
-|0x08013000|download|50 kbyte| download partition |
-
-## How to compile your own firmware
-See Example\Build_You_Own_firmware
-
-## How to force firmware upgrade mode
-When the firmware is brushed dead, short DIO and GND to power on, the blue light is on and then released, and the red light flashes slowly, indicating that is currently in upgrade mode.
-![display](Images/SWD.jpg)
+## How to compile firmware
+Use STM32CubeIDE 1.18.0 or later.
 
 ## How to upgrade firmware
-Open Tools/WeActStudio_Upgrade_Tool and follow the prompts.
-![display](Images/WeActStudio_Upgrade_Tool_en.png)
+Use the upgrade tool in the root repository.
 
-## How to completely empty Flash
-Open the STM32CubeProgrammer, connect the SWD interface of the module using STLink, and perform the following operations:  
-![display](Images/flash_erase.png)
-> If you need to restore factory Firmware, see the `Firmware/README` instructions
-
-## Catalog Description
-| Directory name | content |
-|:--:| :--:|
-|Doc|Datasheet|
-|Hardware| Hardware development data |
-|Examples| Software routines |
-|Tools| Tools|
-
-```
-/*---------------------------------------
-- WeAct Studio Official Link
-- taobao: weactstudio.taobao.com
-- aliexpress: weactstudio.aliexpress.com
-- github: github.com/WeActStudio
-- gitee: gitee.com/WeAct-TC
-- blog: www.weact-tc.cn
----------------------------------------*/
-```
+NOTE: After flashing this firmware, there would be an issue with the upgrade tool.
+You should manually send `X[CR]` command before upgrade or you should force upgrade mode by shorting DIO and GND as described in the root repository.
