@@ -159,7 +159,7 @@ HAL_StatusTypeDef can_enable(void)
         HAL_FDCAN_ConfigGlobalFilter(&hfdcan1, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE);
 
         HAL_FDCAN_ConfigTimestampCounter(&hfdcan1, FDCAN_TIMESTAMP_PRESC_1);
-        // Internal does not work to get time. External use TIM3 as source. See RM0440.
+        // Internal does not work to get time. External use TIM3 as source. See RM0444.
         HAL_FDCAN_EnableTimestampCounter(&hfdcan1, FDCAN_TIMESTAMP_EXTERNAL);
 
         if (HAL_FDCAN_Start(&hfdcan1) != HAL_OK) return HAL_ERROR;

@@ -40,19 +40,19 @@
 // Receive buffering: circular FIFO buffer
 struct buf_cdc_rx
 {
-	uint8_t data[BUF_CDC_RX_NUM_BUFS][BUF_CDC_RX_BUF_SIZE];
-	uint32_t msglen[BUF_CDC_RX_NUM_BUFS];
-	uint8_t head;
-	uint8_t tail;
+    uint8_t data[BUF_CDC_RX_NUM_BUFS][BUF_CDC_RX_BUF_SIZE];
+    uint32_t msglen[BUF_CDC_RX_NUM_BUFS];
+    uint8_t head;
+    uint8_t tail;
 };
 
 // Transmit buffering: triple buffer
 struct buf_cdc_tx
 {
-	uint8_t data[BUF_CDC_TX_NUM_BUFS][BUF_CDC_TX_BUF_SIZE];
-	uint32_t msglen[BUF_CDC_TX_NUM_BUFS];
-	uint8_t head;
-	uint8_t tail;
+    uint8_t data[BUF_CDC_TX_NUM_BUFS][BUF_CDC_TX_BUF_SIZE];
+    uint32_t msglen[BUF_CDC_TX_NUM_BUFS];
+    uint8_t head;
+    uint8_t tail;
 };
 
 // Public variables

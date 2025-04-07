@@ -22,26 +22,26 @@ Using the virtual serial, the command is as follows:
 - `Y4[CR]` - Set the CANFD data segment bit rate to 4M
 - `Y5[CR]` - Set the CANFD data segment bit rate to 5M
 - `yddxxyyzz[CR]` - Custom CANFD data segment bit rate (60Mhz CAN clock)
-- `tIIILDD...[CR] `- Transfer data frame (standard ID) [ID, length, data]
-- `TIIIIIIIILDD...[CR] `- Transfer data frame (extended ID) [ID, length, data]
-- `rIIIL[CR]` - Transfer remote frame (standard ID) [ID, length]
-- `RIIIIIIIIL[CR]` - Transfer remote frame (extended ID) [ID, length]
-- `dIIILDD...[CR] `- Transmit CANFD standard frames (without BRS enabled) [ID, length, data]
-- `DIIIIIIIILDD...[CR] `- Transmit CANFD extended frames (without BRS enabled) [ID, length, data]
-- `bIIILDD...[CR] `- Transmit CANFD standard frames (BRS enabled) [ID, length, data]
-- `BIIIIIIIILDD...[CR] `- Transmit CANFD extended frames (BRS enable) [ID, length, data]
+- `tiiildd...[CR] `- Transfer data frame (standard ID) [ID, length, data]
+- `Tiiiiiiiildd...[CR] `- Transfer data frame (extended ID) [ID, length, data]
+- `riiil[CR]` - Transfer remote frame (standard ID) [ID, length]
+- `Riiiiiiiil[CR]` - Transfer remote frame (extended ID) [ID, length]
+- `diiildd...[CR] `- Transmit CANFD standard frames (without BRS enabled) [ID, length, data]
+- `Diiiiiiiildd...[CR] `- Transmit CANFD extended frames (without BRS enabled) [ID, length, data]
+- `biiildd...[CR] `- Transmit CANFD standard frames (BRS enabled) [ID, length, data]
+- `Biiiiiiiildd...[CR] `- Transmit CANFD extended frames (BRS enable) [ID, length, data]
 - `V[CR]` - Reads the firmware version
 - `X[CR]` - Enter firmware upgrade mode
 
 `[CR]` : `0x0D` (hex), `\r` (ascii)
 
-Please find more information in the `doc` directory or [wiki](https://github.com/Nakakiyo092/usb2canfdv1/wiki).
+Please find more information in the `doc` directory or the [wiki](https://github.com/Nakakiyo092/usb2canfdv1/wiki).
 
 ## How to compile firmware
 Use STM32CubeIDE 1.18.0 or later.
 
 ## How to upgrade firmware
-Use the upgrade tool in the root repository.
+Use the upgrade tool in the [root repository](https://github.com/WeActStudio/WeActStudio.USB2CANFDV1).
 
-NOTE: After flashing this firmware, there would be an issue upgrading to another firmware.
+Note: After flashing this firmware, there would be an issue upgrading to another firmware.
 You should manually send `X[CR]` command before upgrade or force upgrade mode by shorting DIO and GND as described in the root repository.
