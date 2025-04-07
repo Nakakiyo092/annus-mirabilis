@@ -54,7 +54,7 @@ SOFTWARE.
 
 ```
 
-## STM32 HAL
+## STM32 HAL Driver
 
 The HAL is distributed under a non-restrictive BSD (Berkeley Software 
 Distribution) license.
