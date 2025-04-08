@@ -4,34 +4,34 @@
 
 Using the virtual serial, the command is as follows:
 - `O[CR]` - Opens the CAN channel
-- `C[CR]` - Close the CAN channel
-- `S0[CR]` - Set the nominal bit rate to 10k
-- `S1[CR]` - Set the nominal bit rate to 20k
-- `S2[CR]` - Set the nominal bit rate to 50k
-- `S3[CR]` - Set the nominal bit rate to 100k
-- `S4[CR]` - Set the nominal bit rate to 125k (default)
-- `S5[CR]` - Set the nominal bit rate to 250k
-- `S6[CR]` - Set the nominal bit rate to 500k
-- `S7[CR]` - Set the nominal bit rate to 800k
-- `S8[CR]` - Set the nominal bit rate to 1M
+- `C[CR]` - Closes the CAN channel
+- `S0[CR]` - Sets the nominal bit rate to 10k
+- `S1[CR]` - Sets the nominal bit rate to 20k
+- `S2[CR]` - Sets the nominal bit rate to 50k
+- `S3[CR]` - Sets the nominal bit rate to 100k
+- `S4[CR]` - Sets the nominal bit rate to 125k (default)
+- `S5[CR]` - Sets the nominal bit rate to 250k
+- `S6[CR]` - Sets the nominal bit rate to 500k
+- `S7[CR]` - Sets the nominal bit rate to 800k
+- `S8[CR]` - Sets the nominal bit rate to 1M
 - `sddxxyyzz[CR]` - Custom nominal bit rate (60Mhz CAN clock)
-- `Y0[CR]` - Set the CANFD data segment bit rate to 500k
-- `Y1[CR]` - Set the CANFD data segment bit rate to 1M
-- `Y2[CR]` - Set CANFD data segment bit rate to 2M (default)
-- `Y3[CR]` - Set the CANFD data segment bit rate to 3M
-- `Y4[CR]` - Set the CANFD data segment bit rate to 4M
-- `Y5[CR]` - Set the CANFD data segment bit rate to 5M
+- `Y0[CR]` - Sets the CANFD data segment bit rate to 500k
+- `Y1[CR]` - Sets the CANFD data segment bit rate to 1M
+- `Y2[CR]` - Sets the CANFD data segment bit rate to 2M (default)
+- `Y3[CR]` - Sets the CANFD data segment bit rate to 3M
+- `Y4[CR]` - Sets the CANFD data segment bit rate to 4M
+- `Y5[CR]` - Sets the CANFD data segment bit rate to 5M
 - `yddxxyyzz[CR]` - Custom CANFD data segment bit rate (60Mhz CAN clock)
-- `tiiildd...[CR] `- Transfer data frame (standard ID) [ID, length, data]
-- `Tiiiiiiiildd...[CR] `- Transfer data frame (extended ID) [ID, length, data]
-- `riiil[CR]` - Transfer remote frame (standard ID) [ID, length]
-- `Riiiiiiiil[CR]` - Transfer remote frame (extended ID) [ID, length]
-- `diiildd...[CR] `- Transmit CANFD standard frames (without BRS enabled) [ID, length, data]
-- `Diiiiiiiildd...[CR] `- Transmit CANFD extended frames (without BRS enabled) [ID, length, data]
-- `biiildd...[CR] `- Transmit CANFD standard frames (BRS enabled) [ID, length, data]
-- `Biiiiiiiildd...[CR] `- Transmit CANFD extended frames (BRS enable) [ID, length, data]
+- `tiiildd...[CR] `- Transmits data frame (standard ID) [ID, length, data]
+- `Tiiiiiiiildd...[CR] `- Transmits data frame (extended ID) [ID, length, data]
+- `riiil[CR]` - Transmits remote frame (standard ID) [ID, length]
+- `Riiiiiiiil[CR]` - Transmits remote frame (extended ID) [ID, length]
+- `diiildd...[CR] `- Transmits CANFD standard frames (without BRS enabled) [ID, length, data]
+- `Diiiiiiiildd...[CR] `- Transmits CANFD extended frames (without BRS enabled) [ID, length, data]
+- `biiildd...[CR] `- Transmits CANFD standard frames (BRS enabled) [ID, length, data]
+- `Biiiiiiiildd...[CR] `- Transmits CANFD extended frames (BRS enable) [ID, length, data]
 - `V[CR]` - Reads the firmware version
-- `X[CR]` - Enter firmware upgrade mode
+- `X[CR]` - Enters firmware upgrade mode
 
 `[CR]` : `0x0D` (hex), `\r` (ascii)
 
