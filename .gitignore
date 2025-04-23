@@ -13,9 +13,7 @@ UNSupport/
 
 *.swp
 *.save
-.project
 .settings
-.cproject
 obj/
 patches/
 .idea
