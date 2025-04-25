@@ -13,13 +13,17 @@ UNSupport/
 
 *.swp
 *.save
-.settings
-obj/
-patches/
 .idea
 *.crf
 *.d
 *.lnp
+
+# artefacts for STM32CubeIDE
+usb2canfdv1-fw/.settings/
+usb2canfdv1-fw/Debug/
+usb2canfdv1-fw/debug/
+usb2canfdv1-fw/Release/
+usb2canfdv1-fw/release/
 
 # artefacts of top-level Makefile
 /downloads/
