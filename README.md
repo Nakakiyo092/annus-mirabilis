@@ -14,14 +14,14 @@ Using the virtual serial, the command is as follows:
 - `S6[CR]` - Sets the nominal bit rate to 500k
 - `S7[CR]` - Sets the nominal bit rate to 800k
 - `S8[CR]` - Sets the nominal bit rate to 1M
-- `sddxxyyzz[CR]` - Custom nominal bit rate (60Mhz CAN clock)
+- `sddxxyyzz[CR]` - Custom nominal bit rate (60MHz CAN clock)
 - `Y0[CR]` - Sets the CANFD data segment bit rate to 500k
 - `Y1[CR]` - Sets the CANFD data segment bit rate to 1M
 - `Y2[CR]` - Sets the CANFD data segment bit rate to 2M (default)
 - `Y3[CR]` - Sets the CANFD data segment bit rate to 3M
 - `Y4[CR]` - Sets the CANFD data segment bit rate to 4M
 - `Y5[CR]` - Sets the CANFD data segment bit rate to 5M
-- `yddxxyyzz[CR]` - Custom CANFD data segment bit rate (60Mhz CAN clock)
+- `yddxxyyzz[CR]` - Custom CANFD data segment bit rate (60MHhz CAN clock)
 - `tiiildd...[CR] `- Transmits data frame (standard ID) [ID, length, data]
 - `Tiiiiiiiildd...[CR] `- Transmits data frame (extended ID) [ID, length, data]
 - `riiil[CR]` - Transmits remote frame (standard ID) [ID, length]
