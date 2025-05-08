@@ -331,15 +331,15 @@ class LoopbackTestCase(unittest.TestCase):
         self.assertEqual(self.dut.receive(), b"\r")
         self.dut.send(b"t03F0\r")
         rx_data = self.dut.receive()
-        self.assertEqual(len(rx_data), len(b"zt03F0TTTTTTTT\r" + b"t03F0TTTTTTTT\r"))
-        if rx_data[0] == b"z"[0]:
-            tx_timestamp = rx_data[len(b"zt03F0"):len(b"zt03F0") + 8]
+        self.assertEqual(len(rx_data), len(b"\r" + b"zt03F0TTTTTTTT\r" + b"t03F0TTTTTTTT\r"))
+        if rx_data[1] == b"z"[0]:
+            tx_timestamp = rx_data[len(b"\rzt03F0"):len(b"\rzt03F0") + 8]
         else:
-            tx_timestamp = rx_data[len(b"t03F0TTTTTTTT\rzt03F0"):len(b"t03F0TTTTTTTT\rzt03F0") + 8]
-        if rx_data[0] == b"z"[0]:
-            rx_timestamp = rx_data[len(b"zt03F0TTTTTTTT\rt03F0"):len(b"zt03F0TTTTTTTT\rt03F0") + 8]
+            tx_timestamp = rx_data[len(b"\rt03F0TTTTTTTT\rzt03F0"):len(b"\rt03F0TTTTTTTT\rzt03F0") + 8]
+        if rx_data[1] == b"z"[0]:
+            rx_timestamp = rx_data[len(b"\rzt03F0TTTTTTTT\rt03F0"):len(b"\rzt03F0TTTTTTTT\rt03F0") + 8]
         else:
-            rx_timestamp = rx_data[len(b"t03F0"):len(b"t03F0") + 8]
+            rx_timestamp = rx_data[len(b"\rt03F0"):len(b"\rt03F0") + 8]
         self.assertEqual(tx_timestamp, rx_timestamp)
         self.dut.send(b"C\r")
         self.assertEqual(self.dut.receive(), b"\r")
@@ -525,10 +525,10 @@ class LoopbackTestCase(unittest.TestCase):
         self.assertEqual(self.dut.receive(), b"\r")
         for cmd in cmd_send_std:
             self.dut.send(cmd + b"03F0\r")
-            self.assertEqual(self.dut.receive(), b"z" + cmd + b"03F0\r")
+            self.assertEqual(self.dut.receive(), b"\r" + b"z" + cmd + b"03F0\r")
         for cmd in cmd_send_ext:
             self.dut.send(cmd + b"0137FEC80\r")
-            self.assertEqual(self.dut.receive(), b"Z" + cmd + b"0137FEC80\r")
+            self.assertEqual(self.dut.receive(), b"\r" + b"Z" + cmd + b"0137FEC80\r")
         self.dut.send(b"C\r")
         self.assertEqual(self.dut.receive(), b"\r")
 
@@ -548,34 +548,34 @@ class LoopbackTestCase(unittest.TestCase):
             self.dut.send(cmd + b"03F0\r")
             if cmd == b"r" or cmd == b"t":
                 rx_data = self.dut.receive()
-                self.assertEqual(len(rx_data), len(b"z" + cmd + b"03F0\r" + cmd + b"03F0\r"))
-                if rx_data[0] == b"z"[0]:
-                    self.assertEqual(rx_data, b"z" + cmd + b"03F0\r" + cmd + b"03F0\r")
+                self.assertEqual(len(rx_data), len(b"\r" + b"z" + cmd + b"03F0\r" + cmd + b"03F0\r"))
+                if rx_data[1] == b"z"[0]:
+                    self.assertEqual(rx_data, b"\r" + b"z" + cmd + b"03F0\r" + cmd + b"03F0\r")
                 else:
-                    self.assertEqual(rx_data, cmd + b"03F0\r" + b"z" + cmd + b"03F0\r")
+                    self.assertEqual(rx_data, b"\r" + cmd + b"03F0\r" + b"z" + cmd + b"03F0\r")
             else:
                 rx_data = self.dut.receive()
-                self.assertEqual(len(rx_data), len(b"z" + cmd + b"03F00\r" + cmd + b"03F00\r"))
-                if rx_data[0] == b"z"[0]:
-                    self.assertEqual(rx_data, b"z" + cmd + b"03F00\r" + cmd + b"03F00\r")
+                self.assertEqual(len(rx_data), len(b"\r" + b"z" + cmd + b"03F00\r" + cmd + b"03F00\r"))
+                if rx_data[1] == b"z"[0]:
+                    self.assertEqual(rx_data, b"\r" + b"z" + cmd + b"03F00\r" + cmd + b"03F00\r")
                 else:
-                    self.assertEqual(rx_data, cmd + b"03F00\r" + b"z" + cmd + b"03F00\r")
+                    self.assertEqual(rx_data, b"\r" + cmd + b"03F00\r" + b"z" + cmd + b"03F00\r")
         for cmd in cmd_send_ext:
             self.dut.send(cmd + b"0137FEC80\r")
             if cmd == b"R" or cmd == b"T":
                 rx_data = self.dut.receive()
-                self.assertEqual(len(rx_data), len(b"Z" + cmd + b"0137FEC80\r" + cmd + b"0137FEC80\r"))
-                if rx_data[0] == b"Z"[0]:
-                    self.assertEqual(rx_data, b"Z" + cmd + b"0137FEC80\r" + cmd + b"0137FEC80\r")
+                self.assertEqual(len(rx_data), len(b"\r" + b"Z" + cmd + b"0137FEC80\r" + cmd + b"0137FEC80\r"))
+                if rx_data[1] == b"Z"[0]:
+                    self.assertEqual(rx_data, b"\r" + b"Z" + cmd + b"0137FEC80\r" + cmd + b"0137FEC80\r")
                 else:
-                    self.assertEqual(rx_data, cmd + b"0137FEC80\r" + b"Z" + cmd + b"0137FEC80\r")
+                    self.assertEqual(rx_data, b"\r" + cmd + b"0137FEC80\r" + b"Z" + cmd + b"0137FEC80\r")
             else:
                 rx_data = self.dut.receive()
-                self.assertEqual(len(rx_data), len(b"Z" + cmd + b"0137FEC800\r" + cmd + b"0137FEC800\r"))
-                if rx_data[0] == b"Z"[0]:
-                    self.assertEqual(rx_data, b"Z" + cmd + b"0137FEC800\r" + cmd + b"0137FEC800\r")
+                self.assertEqual(len(rx_data), len(b"\r" + b"Z" + cmd + b"0137FEC800\r" + cmd + b"0137FEC800\r"))
+                if rx_data[1] == b"Z"[0]:
+                    self.assertEqual(rx_data, b"\r" + b"Z" + cmd + b"0137FEC800\r" + cmd + b"0137FEC800\r")
                 else:
-                    self.assertEqual(rx_data, cmd + b"0137FEC800\r" + b"Z" + cmd + b"0137FEC800\r")
+                    self.assertEqual(rx_data, b"\r" + cmd + b"0137FEC800\r" + b"Z" + cmd + b"0137FEC800\r")
         self.dut.send(b"C\r")
         self.assertEqual(self.dut.receive(), b"\r")
 
@@ -853,7 +853,7 @@ class LoopbackTestCase(unittest.TestCase):
         for i in range(0, 180):
             tx_data = b"t03F8001122334455" + format(i, "04X").encode() + b"\r"
             self.dut.send(tx_data)
-            rx_data_exp += b"z" + tx_data
+            rx_data_exp += b"\r" + b"z" + tx_data
             time.sleep(0.001)
 
         # check all reply
@@ -913,7 +913,7 @@ class LoopbackTestCase(unittest.TestCase):
         for i in range(0, 180):
             tx_data = b"r" + format(i, "03X").encode() + b"0\r"
             self.dut.send(tx_data)
-            rx_data_exp += b"z" + tx_data
+            rx_data_exp += b"\r" + b"z" + tx_data
             time.sleep(0.001)
 
         # check all reply
