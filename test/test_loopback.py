@@ -941,7 +941,7 @@ class LoopbackTestCase(unittest.TestCase):
         for i in range(0, 4):
             tx_data = tx_data + tx_data    # 11.2ms * 16 = 179.2ms
 
-        # 0% mode
+        # 0% mode (prove 10% accuracy)
         time.sleep(1)
         rx_data = self.dut.receive()
         self.dut.send(b"f\r")
@@ -950,43 +950,46 @@ class LoopbackTestCase(unittest.TestCase):
         self.assertGreaterEqual(int(rx_data[90:92], 10), 0)
         self.assertLessEqual(int(rx_data[90:92], 10), 0)
 
-        # 18% mode
+        # 18% mode (prove 10% accuracy)
+        time.sleep(0.5)
         self.dut.send(tx_data)
         time.sleep(1)
         self.dut.send(tx_data)
-        time.sleep(1)
+        time.sleep(0.5)
         rx_data = self.dut.receive()
         self.dut.send(b"f\r")
         rx_data = self.dut.receive()
         self.assertEqual(len(rx_data), 93)
-        self.assertGreaterEqual(int(rx_data[90:92], 10), 10)
-        self.assertLessEqual(int(rx_data[90:92], 10), 25)
+        self.assertGreaterEqual(int(rx_data[90:92], 10), 8)
+        self.assertLessEqual(int(rx_data[90:92], 10), 28)
 
-        # 36% mode
+        # 36% mode (prove 10% accuracy)
         tx_data = tx_data + tx_data
+        time.sleep(0.5)
         self.dut.send(tx_data)
         time.sleep(1)
         self.dut.send(tx_data)
-        time.sleep(1)
+        time.sleep(0.5)
         rx_data = self.dut.receive()
         self.dut.send(b"f\r")
         rx_data = self.dut.receive()
         self.assertEqual(len(rx_data), 93)
-        self.assertGreaterEqual(int(rx_data[90:92], 10), 25 - 5)    # extra due to CDC delay
-        self.assertLessEqual(int(rx_data[90:92], 10), 45)
+        self.assertGreaterEqual(int(rx_data[90:92], 10), 26)
+        self.assertLessEqual(int(rx_data[90:92], 10), 46)
 
-        # 72% mode
+        # 72% mode (prove 10% accuracy)
         tx_data = tx_data + tx_data
+        time.sleep(0.5)
         self.dut.send(tx_data)
         time.sleep(1)
         self.dut.send(tx_data)
-        time.sleep(1)
+        time.sleep(0.5)
         rx_data = self.dut.receive()
         self.dut.send(b"f\r")
         rx_data = self.dut.receive()
         self.assertEqual(len(rx_data), 93)
-        self.assertGreaterEqual(int(rx_data[90:92], 10), 65 - 5)    # extra due to CDC delay
-        self.assertLessEqual(int(rx_data[90:92], 10), 80)
+        self.assertGreaterEqual(int(rx_data[90:92], 10), 62)
+        self.assertLessEqual(int(rx_data[90:92], 10), 82)
 
         self.dut.send(b"C\r")
         self.assertEqual(self.dut.receive(), b"\r")
