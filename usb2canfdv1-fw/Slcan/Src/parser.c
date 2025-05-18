@@ -47,7 +47,6 @@ enum slcan_filter_mode
 
 // Private variables
 static char *hw_sw_ver = "VW1K0\r";
-//static char *hw_sw_ver_detail = "v: hardware=\"CANable2.0\", software=\"" GIT_VERSION "\", url=\"" GIT_REMOTE "\"\r";
 static char *hw_sw_ver_detail = "v: hardware=\"USB2CANFDV1\", software=\"" "1.0.0" "\", url=\"" "github.com/Nakakiyo092/usb2canfdv1" "\"\r";
 static char *can_info = "I303C\r";
 static char *can_info_detail = "i: protocol=\"ISO-CANFD\", clock_mhz=60, controller=\"STM32G0B1CB\"\r";
@@ -337,21 +336,23 @@ void slcan_parse_str(uint8_t *buf, uint8_t len)
     }
 
     // Transmit the message
-    if (buf_comit_can_dest() == HAL_OK)
-    {
-        if (((slcan_report_reg >> SLCAN_REPORT_TX) & 1) == 0)
-        {
-            // Send ACK (not neccessary if tx event is reported)
-            if (frame_header->IdType == FDCAN_EXTENDED_ID)
-                buf_enqueue_cdc((uint8_t *)"Z\r", 2);
-            else
-                buf_enqueue_cdc((uint8_t *)"z\r", 2);
-        }
-    }
-    else
+    if (buf_comit_can_dest() != HAL_OK)
     {
         buf_enqueue_cdc(SLCAN_RET_ERR, SLCAN_RET_LEN);
         return;
+    }
+
+    // Send ACK
+    if (((slcan_report_reg >> SLCAN_REPORT_TX) & 1) == 0)
+    {
+        if (frame_header->IdType == FDCAN_EXTENDED_ID)
+            buf_enqueue_cdc((uint8_t *)"Z\r", 2);
+        else
+            buf_enqueue_cdc((uint8_t *)"z\r", 2);
+    }
+    else
+    {
+        buf_enqueue_cdc(SLCAN_RET_OK, SLCAN_RET_LEN);
     }
 
     return;

@@ -54,7 +54,7 @@ SOFTWARE.
 
 ```
 
-## STM32 HAL
+## STM32 HAL Driver
 
 The HAL is distributed under a non-restrictive BSD (Berkeley Software 
 Distribution) license.
@@ -65,9 +65,9 @@ License](http://www.st.com/software_license_agreement_liberty_v2)
 
 ## Arm CMSIS
 
-Licensed under the Apache License, Version 2.0 ([the License](www.apache.org/licenses/LICENSE-2.0))
+Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-## printf implementation from @mpaland
+## printf implementation from Marco Paland
 
 ```
 The MIT License (MIT)

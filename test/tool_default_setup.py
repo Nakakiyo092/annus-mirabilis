@@ -66,7 +66,7 @@ class SlcanTestCase(unittest.TestCase):
         rx_data = self.dut.receive()
 
         # Update serial number
-        self.dut.send(b"NAB01\r")
+        self.dut.send(b"NAC01\r")
         time.sleep(0.1)         # Extra wait for flash update
         self.assertEqual(self.dut.receive(), b"\r")
 

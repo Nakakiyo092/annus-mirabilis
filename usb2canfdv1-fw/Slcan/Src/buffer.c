@@ -72,7 +72,7 @@ void buf_init(void)
 void buf_process(void)
 {
     // Process cdc receive buffer
-	__disable_irq();
+    __disable_irq();
     uint32_t tmp_head = buf_cdc_rx.head;
     __enable_irq();
     if (buf_cdc_rx.tail != tmp_head)
@@ -116,7 +116,7 @@ void buf_process(void)
             buf_cdc_tx.msglen[new_head] = 0;
         }
     }
-	__disable_irq();
+    __disable_irq();
     uint32_t new_tail = (buf_cdc_tx.tail + 1UL) % BUF_CDC_TX_NUM_BUFS;
     if (new_tail != buf_cdc_tx.head)
     {
@@ -125,7 +125,7 @@ void buf_process(void)
             buf_cdc_tx.tail = new_tail;
         }
     }
-	__enable_irq();
+    __enable_irq();
 
 
     // Process can transmit buffer
