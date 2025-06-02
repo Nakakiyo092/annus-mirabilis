@@ -141,15 +141,15 @@ HAL_StatusTypeDef can_enable(void)
 
         // Setup Tx delay compensation
         uint32_t offset = can_bit_cfg_data.prescaler * can_bit_cfg_data.time_seg1;
-        //if (offset <= 0x7F)
-        if (offset <= 0x30)
+        if (offset <= 0x1E)
         {
             if (HAL_FDCAN_ConfigTxDelayCompensation(&hfdcan1, offset, 0) != HAL_OK) return HAL_ERROR;
             if (HAL_FDCAN_EnableTxDelayCompensation(&hfdcan1) != HAL_OK) return HAL_ERROR;
         }
         else
         {
-            // Corresponds to bitrate ~ 1Mbps when offset = 0x30, compensation would not be a must
+            // The offset value 0x1E corresponds to bitrate 1Mbps @ 50% sampling point or 2Mbps @ 100% sampling point.
+            // Turn off at 1Mbps and Turn on at 2Mbps
             HAL_FDCAN_DisableTxDelayCompensation(&hfdcan1);
         }
 
