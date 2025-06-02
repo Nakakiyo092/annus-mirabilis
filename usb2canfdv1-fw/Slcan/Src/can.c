@@ -319,7 +319,7 @@ void can_process(void)
 
     if (__HAL_FDCAN_GET_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF))
     {
-        slcan_raise_error(SLCAN_STS_ERROR_PASSIVE);
+        // No status flag for bus off
         __HAL_FDCAN_CLEAR_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF);
     }
 
