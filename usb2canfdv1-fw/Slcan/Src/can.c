@@ -294,6 +294,8 @@ void can_process(void)
     uint8_t rx_err_cnt = (uint8_t)(cnt.RxErrorPassive ? 128 : cnt.RxErrorCnt);
     if (rx_err_cnt > can_error_state.rec || cnt.TxErrorCnt > can_error_state.tec)
         slcan_raise_error(SLCAN_STS_BUS_ERROR);
+    if (sts.BusOff && !can_error_state.bus_off)
+    	slcan_raise_error(SLCAN_STS_BUS_ERROR);  // Capture counter increase that caused bus off
 
     can_error_state.bus_off = (uint8_t)sts.BusOff;
     can_error_state.err_pssv = (uint8_t)sts.ErrorPassive;
@@ -319,7 +321,7 @@ void can_process(void)
 
     if (__HAL_FDCAN_GET_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF))
     {
-        slcan_raise_error(SLCAN_STS_ERROR_PASSIVE);
+        // No status flag for bus off
         __HAL_FDCAN_CLEAR_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF);
     }
 
