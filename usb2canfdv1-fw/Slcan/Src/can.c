@@ -53,6 +53,7 @@ static FDCAN_FilterTypeDef can_ext_pass_all;
 static enum can_bus_state can_bus_state;
 static struct can_error_state can_error_state = {0};
 static uint32_t can_mode = FDCAN_MODE_NORMAL;
+static FunctionalState can_auto_retransmit = ENABLE;
 static struct can_bitrate_cfg can_bit_cfg_nominal, can_bit_cfg_data = {0};
 
 static uint32_t can_cycle_max_time_ns = 0;
@@ -117,7 +118,7 @@ HAL_StatusTypeDef can_enable(void)
         hfdcan1.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
 
         hfdcan1.Init.Mode = can_mode;
-        hfdcan1.Init.AutoRetransmission = ENABLE;
+        hfdcan1.Init.AutoRetransmission = can_auto_retransmit;
         hfdcan1.Init.TransmitPause = DISABLE;
         hfdcan1.Init.ProtocolException = ENABLE;
 
@@ -607,6 +608,19 @@ HAL_StatusTypeDef can_set_mode(uint32_t mode)
         return HAL_ERROR;
     }
     can_mode = mode;
+
+    return HAL_OK;
+}
+
+// Set auto retransmit function
+HAL_StatusTypeDef can_set_auto_retransmit(FunctionalState state)
+{
+    if (can_bus_state == BUS_OPENED)
+    {
+        // cannot set state while on bus
+        return HAL_ERROR;
+    }
+    can_auto_retransmit = state;
 
     return HAL_OK;
 }
