@@ -80,6 +80,8 @@ extern uint16_t slcan_report_reg;
 // Prototypes
 int32_t slcan_generate_rx_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, uint8_t *frame_data);
 int32_t slcan_generate_tx_event(uint8_t *buf, FDCAN_TxEventFifoTypeDef *tx_event, uint8_t *frame_data);
+uint16_t slcan_get_timestamp_ms(void);
+uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us);
 void slcan_set_timestamp_mode(enum slcan_timestamp_mode mode);
 void slcan_set_report_mode(uint16_t reg);
 enum slcan_timestamp_mode slcan_get_timestamp_mode(void);
