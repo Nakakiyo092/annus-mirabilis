@@ -165,7 +165,7 @@ void buf_enqueue_cdc(uint8_t* buf, uint16_t len)
 // Get destination pointer of cdc buffer (Start position of write access)
 uint8_t *buf_get_cdc_dest(void)
 {
-    if (BUF_CDC_TX_BUF_SIZE - SLCAN_MTU < buf_cdc_tx.msglen[buf_cdc_tx.head])
+    if (BUF_CDC_TX_BUF_SIZE - SLCAN_MTU < buf_cdc_tx.msglen[buf_cdc_tx.head])  // TODO do not use slcan parameter
     {
         slcan_raise_error(SLCAN_STS_CAN_RX_FIFO_FULL);  // The data will not fit in the buffer
         return NULL;
@@ -177,7 +177,7 @@ uint8_t *buf_get_cdc_dest(void)
 // Send the data bytes in destination area over USB CDC to host
 void buf_comit_cdc_dest(uint32_t len)
 {
-    buf_cdc_tx.msglen[buf_cdc_tx.head] += len;
+    buf_cdc_tx.msglen[buf_cdc_tx.head] += len;  // TODO protection against overrun
 }
 
 // Get destination pointer of can tx frame header
