@@ -580,6 +580,69 @@ void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len)
         return;
     }
 
+    // Get detailed time
+    if (buf[0] == 'z' && len == 1)
+    {
+        // "z: time_ms=0x0000, time_us=0x00000000, cycle_time_us_ave_max=[0x00, 0x00]\r";
+
+        uint8_t* timstr;
+
+        buf_enqueue_cdc((uint8_t *)"z: time_ms=0x", 13);
+
+        uint16_t timestamp_ms = slcan_get_timestamp_ms();
+        uint32_t timestamp_us = slcan_get_timestamp_us_from_tim3(TIM3->CNT);
+
+        timstr = buf_get_cdc_dest();
+        timstr[0] = slcan_nibble_to_ascii[(timestamp_ms >> 12) & 0xF];
+        timstr[1] = slcan_nibble_to_ascii[(timestamp_ms >> 8) & 0xF];
+        timstr[2] = slcan_nibble_to_ascii[(timestamp_ms >> 4) & 0xF];
+        timstr[3] = slcan_nibble_to_ascii[timestamp_ms & 0xF];
+        buf_comit_cdc_dest(4);
+
+        buf_enqueue_cdc((uint8_t *)", time_us=0x", 12);
+
+        timstr = buf_get_cdc_dest();
+        timstr[0] = slcan_nibble_to_ascii[(timestamp_us >> 28) & 0xF];
+        timstr[1] = slcan_nibble_to_ascii[(timestamp_us >> 24) & 0xF];
+        timstr[2] = slcan_nibble_to_ascii[(timestamp_us >> 20) & 0xF];
+        timstr[3] = slcan_nibble_to_ascii[(timestamp_us >> 16) & 0xF];
+        timstr[4] = slcan_nibble_to_ascii[(timestamp_us >> 12) & 0xF];
+        timstr[5] = slcan_nibble_to_ascii[(timestamp_us >> 8) & 0xF];
+        timstr[6] = slcan_nibble_to_ascii[(timestamp_us >> 4) & 0xF];
+        timstr[7] = slcan_nibble_to_ascii[timestamp_us & 0xF];
+        buf_comit_cdc_dest(8);
+
+        buf_enqueue_cdc((uint8_t *)", cycle_time_us_ave_max=[0x", 27);
+
+        if (can_get_bus_state() == BUS_CLOSED)
+        {
+        	// Cycle time calculation is disabled
+            buf_enqueue_cdc((uint8_t *)"**, 0x**", 8);
+        }
+        else
+        {
+			uint8_t cycle_ave = (uint8_t)(can_get_cycle_ave_time_ns() >= 255000 ? 255 : can_get_cycle_ave_time_ns() / 1000);
+			uint8_t cycle_max = (uint8_t)(can_get_cycle_max_time_ns() >= 255000 ? 255 : can_get_cycle_max_time_ns() / 1000);
+			can_clear_cycle_time();
+
+			timstr = buf_get_cdc_dest();
+	        timstr[0] = slcan_nibble_to_ascii[cycle_ave >> 4];
+	        timstr[1] = slcan_nibble_to_ascii[cycle_ave & 0xF];
+	        buf_comit_cdc_dest(2);
+
+	        buf_enqueue_cdc((uint8_t *)", 0x", 4);
+
+	        timstr = buf_get_cdc_dest();
+	        timstr[0] = slcan_nibble_to_ascii[cycle_max >> 4];
+	        timstr[1] = slcan_nibble_to_ascii[cycle_max & 0xF];
+	        buf_comit_cdc_dest(2);
+        }
+
+        buf_enqueue_cdc((uint8_t *)"]\r", 2);
+
+        return;
+    }
+
     // Set report mode
     if (can_get_bus_state() == BUS_CLOSED)
     {

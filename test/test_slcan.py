@@ -386,6 +386,13 @@ class SlcanTestCase(unittest.TestCase):
 
 
     def test_z_command(self):
+        # Without option
+        self.dut.send(b"z\r")
+        rx_data = self.dut.receive()
+        self.assertGreaterEqual(len(rx_data), len(b"z\r"))
+        self.assertEqual(rx_data[0], b"z\r"[0])
+
+        # With option
         # check response with CAN port closed
         for idx in range(0, 10):
             cmd = "z" + str(idx) + "000\r"
@@ -416,6 +423,8 @@ class SlcanTestCase(unittest.TestCase):
         self.assertEqual(self.dut.receive(), b"\r")
 
         # invalid format
+        self.dut.send(b"z0\r")
+        self.assertEqual(self.dut.receive(), b"\a")
         self.dut.send(b"z000\r")
         self.assertEqual(self.dut.receive(), b"\a")
         self.dut.send(b"z00000\r")
