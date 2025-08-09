@@ -216,7 +216,7 @@ void can_process(void)
     // If message transmitted on bus, parse the frame
     if (HAL_FDCAN_GetTxEvent(&hfdcan1, &tx_event) == HAL_OK)
     {
-        int32_t len = slcan_generate_tx_event(buf_get_cdc_dest(), &tx_event, buf_dequeue_can_tx_data());
+        int32_t len = slcan_generate_tx_event(buf_get_cdc_dest(SLCAN_MTU), &tx_event, buf_dequeue_can_tx_data());
         buf_comit_cdc_dest(len);
 
         if (tx_event.TxTimestamp != last_frame_time_cnt)    // Don't count same frame.
@@ -231,7 +231,7 @@ void can_process(void)
     // Message has been accepted, pull it from the buffer
     if (HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &rx_msg_header, rx_msg_data) == HAL_OK)
     {
-        int32_t len = slcan_generate_rx_frame(buf_get_cdc_dest(), &rx_msg_header, rx_msg_data);
+        int32_t len = slcan_generate_rx_frame(buf_get_cdc_dest(SLCAN_MTU), &rx_msg_header, rx_msg_data);
         buf_comit_cdc_dest(len);
 
         if (rx_msg_header.RxTimestamp != last_frame_time_cnt)   // Don't count same frame.

@@ -545,7 +545,7 @@ void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len)
         // Check timestamp mode
         if (slcan_timestamp_mode == SLCAN_TIMESTAMP_MILLI)
         {
-        	uint8_t* tmsstr = buf_get_cdc_dest();
+        	uint8_t* tmsstr = buf_get_cdc_dest(SLCAN_MTU);
         	uint16_t timestamp_ms = slcan_get_timestamp_ms();
 
         	tmsstr[0] = 'Z';
@@ -558,7 +558,7 @@ void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len)
         }
         else if (slcan_timestamp_mode == SLCAN_TIMESTAMP_MICRO)
         {
-        	uint8_t* tmsstr = buf_get_cdc_dest();
+        	uint8_t* tmsstr = buf_get_cdc_dest(SLCAN_MTU);
         	uint32_t timestamp_us = slcan_get_timestamp_us_from_tim3(TIM3->CNT);
 
         	tmsstr[0] = 'Z';
@@ -592,7 +592,7 @@ void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len)
         uint16_t timestamp_ms = slcan_get_timestamp_ms();
         uint32_t timestamp_us = slcan_get_timestamp_us_from_tim3(TIM3->CNT);
 
-        timstr = buf_get_cdc_dest();
+        timstr = buf_get_cdc_dest(SLCAN_MTU);
         timstr[0] = slcan_nibble_to_ascii[(timestamp_ms >> 12) & 0xF];
         timstr[1] = slcan_nibble_to_ascii[(timestamp_ms >> 8) & 0xF];
         timstr[2] = slcan_nibble_to_ascii[(timestamp_ms >> 4) & 0xF];
@@ -601,7 +601,7 @@ void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len)
 
         buf_enqueue_cdc((uint8_t *)", time_us=0x", 12);
 
-        timstr = buf_get_cdc_dest();
+        timstr = buf_get_cdc_dest(SLCAN_MTU);
         timstr[0] = slcan_nibble_to_ascii[(timestamp_us >> 28) & 0xF];
         timstr[1] = slcan_nibble_to_ascii[(timestamp_us >> 24) & 0xF];
         timstr[2] = slcan_nibble_to_ascii[(timestamp_us >> 20) & 0xF];
@@ -625,14 +625,14 @@ void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len)
 			uint8_t cycle_max = (uint8_t)(can_get_cycle_max_time_ns() >= 255000 ? 255 : can_get_cycle_max_time_ns() / 1000);
 			can_clear_cycle_time();
 
-			timstr = buf_get_cdc_dest();
+			timstr = buf_get_cdc_dest(SLCAN_MTU);
 	        timstr[0] = slcan_nibble_to_ascii[cycle_ave >> 4];
 	        timstr[1] = slcan_nibble_to_ascii[cycle_ave & 0xF];
 	        buf_comit_cdc_dest(2);
 
 	        buf_enqueue_cdc((uint8_t *)", 0x", 4);
 
-	        timstr = buf_get_cdc_dest();
+	        timstr = buf_get_cdc_dest(SLCAN_MTU);
 	        timstr[0] = slcan_nibble_to_ascii[cycle_max >> 4];
 	        timstr[1] = slcan_nibble_to_ascii[cycle_max & 0xF];
 	        buf_comit_cdc_dest(2);
@@ -894,7 +894,7 @@ void slcan_parse_str_number(uint8_t *buf, uint8_t len)
     {
         // Report serial number
         uint16_t serial;
-        char* numstr = (char*)buf_get_cdc_dest();
+        char* numstr = (char*)buf_get_cdc_dest(SLCAN_MTU);
         if (nvm_get_serial_number(&serial) == HAL_OK)
         {
             snprintf(numstr, SLCAN_MTU - 1, "N%04X\r", serial);
@@ -938,7 +938,7 @@ void slcan_parse_str_status(uint8_t *buf, uint8_t len)
     {
         if (buf[0] == 'F')
         {
-            uint8_t* stsstr = buf_get_cdc_dest();
+            uint8_t* stsstr = buf_get_cdc_dest(SLCAN_MTU);
             stsstr[0] = 'F';
             stsstr[1] = slcan_nibble_to_ascii[slcan_status_flags >> 4];
             stsstr[2] = slcan_nibble_to_ascii[slcan_status_flags & 0xF];
@@ -950,7 +950,7 @@ void slcan_parse_str_status(uint8_t *buf, uint8_t len)
         }
         else if (buf[0] == 'f')
         {
-            char* stsstr = (char*)buf_get_cdc_dest();
+            char* stsstr = (char*)buf_get_cdc_dest(SLCAN_MTU);
 
             struct can_error_state err = can_get_error_state();
 
