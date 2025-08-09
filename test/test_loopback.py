@@ -135,8 +135,8 @@ class LoopbackTestCase(unittest.TestCase):
     def test_data_bitrate(self):
         #self.dut.print_on = True
         # check response to SEND in every data bitrate
-        #for rate in (0, 1, 2, 4, 5, 8):
-        for rate in (0, 1, 2, 3, 4, 5):
+        #for rate in (0, 1, 2, 4, 5, 8):    # for CANable2
+        for rate in (0, 1, 2, 3, 4, 5):    # for USB2CANFDV1
             cmd = "Y" + str(rate) + "\r"
             self.dut.send(cmd.encode())
             self.assertEqual(self.dut.receive(), b"\r")
