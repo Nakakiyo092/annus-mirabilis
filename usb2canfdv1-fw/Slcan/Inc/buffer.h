@@ -64,8 +64,8 @@ void buf_init(void);
 void buf_process(void);
 
 void buf_enqueue_cdc(uint8_t* buf, uint16_t len);
-uint8_t *buf_get_cdc_dest(void);
-void buf_comit_cdc_dest(uint32_t len);
+uint8_t *buf_get_cdc_dest(uint16_t len);
+void buf_comit_cdc_dest(uint16_t len);
 
 FDCAN_TxHeaderTypeDef *buf_get_can_dest_header(void);
 uint8_t *buf_get_can_dest_data(void);
