@@ -235,8 +235,8 @@ class SlcanTestCase(unittest.TestCase):
         for idx in range(0, 10):
             cmd = "Y" + str(idx) + "\r"
             self.dut.send(cmd.encode())
-            #if idx in (0, 1, 2, 4, 5, 8):
-            if idx in (0, 1, 2, 3, 4, 5):
+            #if idx in (0, 1, 2, 4, 5, 8):    # for CANable2
+            if idx in (0, 1, 2, 3, 4, 5):    # for USB2CANFDV1
                 self.assertEqual(self.dut.receive(), b"\r")
             else:
                 self.assertEqual(self.dut.receive(), b"\a")
