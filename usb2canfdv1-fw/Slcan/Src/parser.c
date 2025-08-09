@@ -64,6 +64,7 @@ static void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len);
 static void slcan_parse_str_filter_mode(uint8_t *buf, uint8_t len);
 static void slcan_parse_str_filter_code(uint8_t *buf, uint8_t len);
 static void slcan_parse_str_filter_mask(uint8_t *buf, uint8_t len);
+static void slcan_parse_str_set_auto_retransmit(uint8_t *buf, uint8_t len);
 static void slcan_parse_str_version(uint8_t *buf, uint8_t len);
 static void slcan_parse_str_can_info(uint8_t *buf, uint8_t len);
 static void slcan_parse_str_number(uint8_t *buf, uint8_t len);
@@ -146,6 +147,10 @@ void slcan_parse_str(uint8_t *buf, uint8_t len)
     // Set filter mask
     case 'm':
         slcan_parse_str_filter_mask(buf, len);
+        return;
+    // Set auto retransmit
+    case '-':
+        slcan_parse_str_set_auto_retransmit(buf, len);
         return;
     // Set auto startup mode
     case 'Q':
@@ -534,6 +539,110 @@ void slcan_parse_str_set_bitrate(uint8_t *buf, uint8_t len)
 // Set report mode
 void slcan_parse_str_report_mode(uint8_t *buf, uint8_t len)
 {
+    // Get timestamp
+    if (buf[0] == 'Z' && len == 1)
+    {
+        // Check timestamp mode
+        if (slcan_timestamp_mode == SLCAN_TIMESTAMP_MILLI)
+        {
+        	uint8_t* tmsstr = buf_get_cdc_dest();
+        	uint16_t timestamp_ms = slcan_get_timestamp_ms();
+
+        	tmsstr[0] = 'Z';
+        	tmsstr[1] = slcan_nibble_to_ascii[(timestamp_ms >> 12) & 0xF];
+        	tmsstr[2] = slcan_nibble_to_ascii[(timestamp_ms >> 8) & 0xF];
+        	tmsstr[3] = slcan_nibble_to_ascii[(timestamp_ms >> 4) & 0xF];
+        	tmsstr[4] = slcan_nibble_to_ascii[timestamp_ms & 0xF];
+        	tmsstr[5] = '\r';
+            buf_comit_cdc_dest(6);
+        }
+        else if (slcan_timestamp_mode == SLCAN_TIMESTAMP_MICRO)
+        {
+        	uint8_t* tmsstr = buf_get_cdc_dest();
+        	uint32_t timestamp_us = slcan_get_timestamp_us_from_tim3(TIM3->CNT);
+
+        	tmsstr[0] = 'Z';
+        	tmsstr[1] = slcan_nibble_to_ascii[(timestamp_us >> 28) & 0xF];
+        	tmsstr[2] = slcan_nibble_to_ascii[(timestamp_us >> 24) & 0xF];
+        	tmsstr[3] = slcan_nibble_to_ascii[(timestamp_us >> 20) & 0xF];
+        	tmsstr[4] = slcan_nibble_to_ascii[(timestamp_us >> 16) & 0xF];
+        	tmsstr[5] = slcan_nibble_to_ascii[(timestamp_us >> 12) & 0xF];
+        	tmsstr[6] = slcan_nibble_to_ascii[(timestamp_us >> 8) & 0xF];
+        	tmsstr[7] = slcan_nibble_to_ascii[(timestamp_us >> 4) & 0xF];
+        	tmsstr[8] = slcan_nibble_to_ascii[timestamp_us & 0xF];
+        	tmsstr[9] = '\r';
+            buf_comit_cdc_dest(10);
+        }
+        else
+        {
+            buf_enqueue_cdc(SLCAN_RET_ERR, SLCAN_RET_LEN);
+        }
+        return;
+    }
+
+    // Get detailed time
+    if (buf[0] == 'z' && len == 1)
+    {
+        // "z: time_ms=0x0000, time_us=0x00000000, cycle_time_us_ave_max=[0x00, 0x00]\r";
+
+        uint8_t* timstr;
+
+        buf_enqueue_cdc((uint8_t *)"z: time_ms=0x", 13);
+
+        uint16_t timestamp_ms = slcan_get_timestamp_ms();
+        uint32_t timestamp_us = slcan_get_timestamp_us_from_tim3(TIM3->CNT);
+
+        timstr = buf_get_cdc_dest();
+        timstr[0] = slcan_nibble_to_ascii[(timestamp_ms >> 12) & 0xF];
+        timstr[1] = slcan_nibble_to_ascii[(timestamp_ms >> 8) & 0xF];
+        timstr[2] = slcan_nibble_to_ascii[(timestamp_ms >> 4) & 0xF];
+        timstr[3] = slcan_nibble_to_ascii[timestamp_ms & 0xF];
+        buf_comit_cdc_dest(4);
+
+        buf_enqueue_cdc((uint8_t *)", time_us=0x", 12);
+
+        timstr = buf_get_cdc_dest();
+        timstr[0] = slcan_nibble_to_ascii[(timestamp_us >> 28) & 0xF];
+        timstr[1] = slcan_nibble_to_ascii[(timestamp_us >> 24) & 0xF];
+        timstr[2] = slcan_nibble_to_ascii[(timestamp_us >> 20) & 0xF];
+        timstr[3] = slcan_nibble_to_ascii[(timestamp_us >> 16) & 0xF];
+        timstr[4] = slcan_nibble_to_ascii[(timestamp_us >> 12) & 0xF];
+        timstr[5] = slcan_nibble_to_ascii[(timestamp_us >> 8) & 0xF];
+        timstr[6] = slcan_nibble_to_ascii[(timestamp_us >> 4) & 0xF];
+        timstr[7] = slcan_nibble_to_ascii[timestamp_us & 0xF];
+        buf_comit_cdc_dest(8);
+
+        buf_enqueue_cdc((uint8_t *)", cycle_time_us_ave_max=[0x", 27);
+
+        if (can_get_bus_state() == BUS_CLOSED)
+        {
+        	// Cycle time calculation is disabled
+            buf_enqueue_cdc((uint8_t *)"**, 0x**", 8);
+        }
+        else
+        {
+			uint8_t cycle_ave = (uint8_t)(can_get_cycle_ave_time_ns() >= 255000 ? 255 : can_get_cycle_ave_time_ns() / 1000);
+			uint8_t cycle_max = (uint8_t)(can_get_cycle_max_time_ns() >= 255000 ? 255 : can_get_cycle_max_time_ns() / 1000);
+			can_clear_cycle_time();
+
+			timstr = buf_get_cdc_dest();
+	        timstr[0] = slcan_nibble_to_ascii[cycle_ave >> 4];
+	        timstr[1] = slcan_nibble_to_ascii[cycle_ave & 0xF];
+	        buf_comit_cdc_dest(2);
+
+	        buf_enqueue_cdc((uint8_t *)", 0x", 4);
+
+	        timstr = buf_get_cdc_dest();
+	        timstr[0] = slcan_nibble_to_ascii[cycle_max >> 4];
+	        timstr[1] = slcan_nibble_to_ascii[cycle_max & 0xF];
+	        buf_comit_cdc_dest(2);
+        }
+
+        buf_enqueue_cdc((uint8_t *)"]\r", 2);
+
+        return;
+    }
+
     // Set report mode
     if (can_get_bus_state() == BUS_CLOSED)
     {
@@ -704,6 +813,37 @@ void slcan_parse_str_filter_mask(uint8_t *buf, uint8_t len)
         return;
     }
     // This command is only active if the CAN channel is initiated and not opened.
+    else
+    {
+        buf_enqueue_cdc(SLCAN_RET_ERR, SLCAN_RET_LEN);
+        return;
+    }
+}
+
+// Set auto retransmit
+static void slcan_parse_str_set_auto_retransmit(uint8_t *buf, uint8_t len)
+{
+    // Set auto retransmit
+    if (can_get_bus_state() == BUS_CLOSED)
+    {
+        // Check for valid command
+        if (len != 2 || 2 <= buf[1])
+        {
+            buf_enqueue_cdc(SLCAN_RET_ERR, SLCAN_RET_LEN);
+            return;
+        }
+
+        // Apply the state
+        if (can_set_auto_retransmit((buf[1] == 0) ? DISABLE : ENABLE) != HAL_OK)
+        {
+            buf_enqueue_cdc(SLCAN_RET_ERR, SLCAN_RET_LEN);
+            return;
+        }
+
+        buf_enqueue_cdc(SLCAN_RET_OK, SLCAN_RET_LEN);
+        return;
+    }
+    // Command can only be sent if the device is initiated but not open.
     else
     {
         buf_enqueue_cdc(SLCAN_RET_ERR, SLCAN_RET_LEN);

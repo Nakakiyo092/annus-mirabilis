@@ -53,6 +53,7 @@ static FDCAN_FilterTypeDef can_ext_pass_all;
 static enum can_bus_state can_bus_state;
 static struct can_error_state can_error_state = {0};
 static uint32_t can_mode = FDCAN_MODE_NORMAL;
+static FunctionalState can_auto_retransmit = ENABLE;
 static struct can_bitrate_cfg can_bit_cfg_nominal, can_bit_cfg_data = {0};
 
 static uint32_t can_cycle_max_time_ns = 0;
@@ -117,7 +118,7 @@ HAL_StatusTypeDef can_enable(void)
         hfdcan1.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
 
         hfdcan1.Init.Mode = can_mode;
-        hfdcan1.Init.AutoRetransmission = ENABLE;
+        hfdcan1.Init.AutoRetransmission = can_auto_retransmit;
         hfdcan1.Init.TransmitPause = DISABLE;
         hfdcan1.Init.ProtocolException = ENABLE;
 
@@ -140,15 +141,15 @@ HAL_StatusTypeDef can_enable(void)
 
         // Setup Tx delay compensation
         uint32_t offset = can_bit_cfg_data.prescaler * can_bit_cfg_data.time_seg1;
-        //if (offset <= 0x7F)
-        if (offset <= 0x30)
+        if (offset <= 0x1E)
         {
             if (HAL_FDCAN_ConfigTxDelayCompensation(&hfdcan1, offset, 0) != HAL_OK) return HAL_ERROR;
             if (HAL_FDCAN_EnableTxDelayCompensation(&hfdcan1) != HAL_OK) return HAL_ERROR;
         }
         else
         {
-            // Corresponds to bitrate ~ 1Mbps when offset = 0x30, compensation would not be a must
+            // The offset value 0x1E corresponds to bitrate 1Mbps @ 50% sampling point or 2Mbps @ 100% sampling point.
+            // Turn off at 1Mbps and Turn on at 2Mbps
             HAL_FDCAN_DisableTxDelayCompensation(&hfdcan1);
         }
 
@@ -294,6 +295,8 @@ void can_process(void)
     uint8_t rx_err_cnt = (uint8_t)(cnt.RxErrorPassive ? 128 : cnt.RxErrorCnt);
     if (rx_err_cnt > can_error_state.rec || cnt.TxErrorCnt > can_error_state.tec)
         slcan_raise_error(SLCAN_STS_BUS_ERROR);
+    if (sts.BusOff && !can_error_state.bus_off)
+    	slcan_raise_error(SLCAN_STS_BUS_ERROR);  // Capture counter increase that caused bus off
 
     can_error_state.bus_off = (uint8_t)sts.BusOff;
     can_error_state.err_pssv = (uint8_t)sts.ErrorPassive;
@@ -319,7 +322,7 @@ void can_process(void)
 
     if (__HAL_FDCAN_GET_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF))
     {
-        slcan_raise_error(SLCAN_STS_ERROR_PASSIVE);
+        // No status flag for bus off
         __HAL_FDCAN_CLEAR_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF);
     }
 
@@ -605,6 +608,19 @@ HAL_StatusTypeDef can_set_mode(uint32_t mode)
         return HAL_ERROR;
     }
     can_mode = mode;
+
+    return HAL_OK;
+}
+
+// Set auto retransmit function
+HAL_StatusTypeDef can_set_auto_retransmit(FunctionalState state)
+{
+    if (can_bus_state == BUS_OPENED)
+    {
+        // cannot set state while on bus
+        return HAL_ERROR;
+    }
+    can_auto_retransmit = state;
 
     return HAL_OK;
 }
