@@ -1,5 +1,11 @@
 @echo off
 
+:: Restore default setup
+echo.
+echo.
+echo Restoring default setup
+python test\tool_default_setup.py
+
 :: Run all test cases
 echo.
 echo.
@@ -53,7 +59,7 @@ python test\test_led.py
 :: Restore default setup
 echo.
 echo.
-echo Restoring default setup...
+echo Restoring default setup
 python test\tool_default_setup.py
 echo.
 echo.
