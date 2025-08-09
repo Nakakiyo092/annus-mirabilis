@@ -3,6 +3,12 @@
 # Set permission for USB port
 sudo chmod 666 /dev/ttyACM0
 
+# Restore default setup
+echo ""
+echo ""
+echo "Restore default setup"
+python3 test/tool_default_setup.py
+
 # Run all test cases
 echo ""
 echo ""
