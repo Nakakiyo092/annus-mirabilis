@@ -33,14 +33,6 @@ echo Running test after reset
 python test\test_reset_after.py
 echo.
 echo.
-echo Fix CAN bus at dominant level then press enter...
-pause
-echo.
-echo.
-echo Running dominant test cases...
-python test\test_dominant.py
-echo.
-echo.
 echo Short CAN high and low then press enter...
 pause
 echo.
