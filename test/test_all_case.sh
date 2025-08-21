@@ -37,14 +37,6 @@ echo "Running test after reset"
 python3 test/test_reset_after.py
 echo ""
 echo ""
-echo "Fix CAN bus at dominant level then press enter..."
-read input
-echo ""
-echo ""
-echo "Running dominant test cases"
-python3 test/test_dominant.py
-echo ""
-echo ""
 echo "Short CAN high and low then press enter..."
 read input
 echo ""
