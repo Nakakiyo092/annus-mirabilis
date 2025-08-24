@@ -211,6 +211,7 @@ uint16_t slcan_get_timestamp_ms(void)
 }
 
 // Gets micro second timestamp (4bytes, MAX 3600,000,000us)
+// tim3_us does not have to be current value but must be close to it.
 uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us)
 {
     static uint32_t slcan_last_timestamp_us = 0;
@@ -229,6 +230,7 @@ uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us)
     if (time_diff_ms <= 1 && time_diff_us > UINT16_MAX / 2)
     {
         // Assume tim3 was sampled before the last timestamp
+        // This can happen when a CAN frame is retrieved after answering a 'Z[CR]'
         // The amount of reversal should be close to the main loop (~100us)
         time_diff_us = (uint64_t)3600000000 - (uint16_t)(slcan_last_time_us - current_time_us);
     }
@@ -236,7 +238,7 @@ uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us)
     {
         // Compensate overflow of micro second counter
         n_comp = ((uint64_t)UINT16_MAX / 2 + time_diff_ms * 1000 - time_diff_us);   // MAX 0x10000, 0xFFFFFFFF * 1000, 0xFFFF
-        n_comp = n_comp / ((uint64_t)UINT16_MAX + 1);                               // MAX 0xFFFF * 1000 + ?
+        n_comp = n_comp / ((uint64_t)UINT16_MAX + 1);                               // Numver of overflow  MAX 0xFFFF * 1000 + ?
         time_diff_us = time_diff_us + n_comp * ((uint64_t)UINT16_MAX + 1);          // MAX 0xFFFF * 1000 * 0x10000
     }
 
