@@ -78,16 +78,16 @@ int32_t slcan_generate_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, 
         msg_idx = 1 + SLCAN_EXT_ID_LEN;     // Type & ID
     }
 
-    // Add identifier to buffer
+    // Add identifier to the buffer
     uint32_t tmp = frame_header->Identifier;
     for (uint8_t j = msg_idx - 1; j >= 1; j--)
     {
-        // Add nibble to buffer
+        // Add nibble to the buffer
         buf[j] = slcan_nibble_to_ascii[tmp & 0xF];
         tmp = tmp >> 4;
     }
 
-    // Add DLC to buffer
+    // Add DLC to the buffer
     buf[msg_idx++] = slcan_nibble_to_ascii[CAN_HAL_DLC_TO_STD_DLC(frame_header->DataLength)];
     int8_t bytes = can_dlc_to_bytes[CAN_HAL_DLC_TO_STD_DLC(frame_header->DataLength)];
     
@@ -149,7 +149,7 @@ int32_t slcan_generate_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, 
 // Parse an incoming CAN frame into an outgoing slcan message
 int32_t slcan_generate_rx_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, uint8_t *frame_data)
 {
-    // Rx reporting not required
+    // Check if Rx reporting is required
     if (((slcan_report_reg >> SLCAN_REPORT_RX) & 1) == 0)
         return 0;
 
@@ -165,7 +165,7 @@ int32_t slcan_generate_rx_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_heade
 // Parse an incoming Tx event into an outgoing slcan message
 int32_t slcan_generate_tx_event(uint8_t *buf, FDCAN_TxEventFifoTypeDef *tx_event, uint8_t *frame_data)
 {
-    // Tx reporting not required
+    // Check if Tx reporting is required
     if (((slcan_report_reg >> SLCAN_REPORT_TX) & 1) == 0)
         return 0;
 
@@ -193,7 +193,7 @@ int32_t slcan_generate_tx_event(uint8_t *buf, FDCAN_TxEventFifoTypeDef *tx_event
 }
 
 
-// Gets milli second timestamp (2bytes, MAX 60,000ms)
+// Gets milli second timestamp for the current time (2bytes, Resets at 60,000ms)
 uint16_t slcan_get_timestamp_ms(void)
 {
     static uint16_t slcan_last_timestamp_ms = 0;
@@ -210,8 +210,9 @@ uint16_t slcan_get_timestamp_ms(void)
     return slcan_last_timestamp_ms;
 }
 
-// Gets micro second timestamp (4bytes, MAX 3600,000,000us)
-// tim3_us does not have to be current value but must be close to it.
+// Gets micro second timestamp for the tim3 clock (4bytes, Resets at 3600,000,000us)
+// The tim3_us does not have to be the current value but supposed to be close to it (like ~1ms).
+// The difference between the current tim3 value and tim3_us should never be more than UINT16_MAX / 2.
 uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us)
 {
     static uint32_t slcan_last_timestamp_us = 0;
@@ -236,9 +237,9 @@ uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us)
     }
     else
     {
-        // Compensate overflow of micro second counter
+        // Compensate overflow of micro second counter using milli second counter
         n_comp = ((uint64_t)UINT16_MAX / 2 + time_diff_ms * 1000 - time_diff_us);   // MAX 0x10000, 0xFFFFFFFF * 1000, 0xFFFF
-        n_comp = n_comp / ((uint64_t)UINT16_MAX + 1);                               // Numver of overflow  MAX 0xFFFF * 1000 + ?
+        n_comp = n_comp / ((uint64_t)UINT16_MAX + 1);                               // Number of overflow  MAX 0xFFFF * 1000 + ?
         time_diff_us = time_diff_us + n_comp * ((uint64_t)UINT16_MAX + 1);          // MAX 0xFFFF * 1000 * 0x10000
     }
 
