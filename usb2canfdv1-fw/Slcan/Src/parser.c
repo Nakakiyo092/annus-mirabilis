@@ -738,6 +738,7 @@ void slcan_parse_str_filter_code(uint8_t *buf, uint8_t len)
             slcan_filter_code = (slcan_filter_code << 4) + buf[1 + i];
         }
         
+        // Frame type selection. See https://github.com/Nakakiyo092/canable2-fw/issues/66
         FunctionalState state_std = ENABLE;
         FunctionalState state_ext = ENABLE;
         if ((slcan_filter_code >> 31) && !(slcan_filter_mask >> 31))
@@ -791,6 +792,7 @@ void slcan_parse_str_filter_mask(uint8_t *buf, uint8_t len)
             slcan_filter_mask = (slcan_filter_mask << 4) + buf[1 + i];
         }
 
+        // Frame type selection. See https://github.com/Nakakiyo092/canable2-fw/issues/66
         FunctionalState state_std = ENABLE;
         FunctionalState state_ext = ENABLE;
         if ((slcan_filter_code >> 31) && !(slcan_filter_mask >> 31))
