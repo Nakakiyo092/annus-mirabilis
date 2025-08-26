@@ -40,6 +40,7 @@
 
 // Parameter to calculate bus load
 #define CAN_BUS_LOAD_BUILDUP_PPM        1125000     /* Compensate stuff bits (10%) and round down (2.5%) in bus laod calc */
+#define CAN_ROOT_CLOCK_MHZ              80
 
 // Public variable
 uint8_t can_dlc_to_bytes[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 20, 24, 32, 48, 64};
@@ -299,7 +300,7 @@ void can_process(void)
     if (rx_err_cnt > can_error_state.rec || cnt.TxErrorCnt > can_error_state.tec)
         slcan_raise_error(SLCAN_STS_BUS_ERROR);
     if (sts.BusOff && !can_error_state.bus_off)     // If it gets bus off right now
-    	slcan_raise_error(SLCAN_STS_BUS_ERROR);     // Capture counter increase that caused bus off
+    	slcan_raise_error(SLCAN_STS_BUS_ERROR);     // capture counter increase that caused bus off
 
     can_error_state.bus_off = (uint8_t)sts.BusOff;
     can_error_state.err_pssv = (uint8_t)sts.ErrorPassive;
@@ -683,10 +684,12 @@ FDCAN_HandleTypeDef *can_get_handle(void)
 // Get the nominal one bit time in nanoseconds
 void can_update_bit_time_ns(void)
 {
+    // Number of time quanta (Tq) in one bit
     can_bit_time_ns = ((uint32_t)1 + can_bit_cfg_nominal.time_seg1 + can_bit_cfg_nominal.time_seg2);
-    can_bit_time_ns = can_bit_time_ns * can_bit_cfg_nominal.prescaler;  // Tq in one bit
-    can_bit_time_ns = can_bit_time_ns * 1000;                           // MAX: (1 + 256 + 128) * 1000
-    can_bit_time_ns = can_bit_time_ns / 80;                             // CAN clock: 80MHz = (80 / 1000) GHz TODO MAKE THIS A MACRO
+    // times Tq [ns] = prescaler / CAN clock [GHz] = prescaler * 1000 / CAN clock [MHz]
+    can_bit_time_ns = can_bit_time_ns * can_bit_cfg_nominal.prescaler;
+    can_bit_time_ns = can_bit_time_ns * 1000;
+    can_bit_time_ns = can_bit_time_ns / CAN_ROOT_CLOCK_MHZ;
 
     return;
 }
