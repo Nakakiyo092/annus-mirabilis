@@ -212,7 +212,7 @@ uint16_t slcan_get_timestamp_ms(void)
 
 // Gets micro second timestamp for the tim3 clock (4bytes, Resets at 3600,000,000us)
 // The tim3_us does not have to be the current value but supposed to be close to it (like ~1ms).
-// The difference between the current tim3 value and tim3_us should never be more than UINT16_MAX / 2.
+// The difference between the current tim3 value and tim3_us should never be more than UINT16_MAX / 2 ~ 30ms.
 uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us)
 {
     static uint32_t slcan_last_timestamp_us = 0;
@@ -239,7 +239,7 @@ uint32_t slcan_get_timestamp_us_from_tim3(uint16_t tim3_us)
     {
         // Compensate overflow of micro second counter using milli second counter
         n_comp = ((uint64_t)UINT16_MAX / 2 + time_diff_ms * 1000 - time_diff_us);   // MAX 0x10000, 0xFFFFFFFF * 1000, 0xFFFF
-        n_comp = n_comp / ((uint64_t)UINT16_MAX + 1);                               // Number of overflow  MAX 0xFFFF * 1000 + ?
+        n_comp = n_comp / ((uint64_t)UINT16_MAX + 1);                               // Number of overflows  MAX 0xFFFF * 1000 + ?
         time_diff_us = time_diff_us + n_comp * ((uint64_t)UINT16_MAX + 1);          // MAX 0xFFFF * 1000 * 0x10000
     }
 

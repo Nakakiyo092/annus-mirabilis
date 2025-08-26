@@ -262,7 +262,7 @@ void can_process(void)
     {
         uint32_t rate_us_per_ms = (uint32_t)bit_cnt_message * can_bit_time_ns / 1000 / 100;   // Bus occupied time (us) / Interval (ms)
 
-        // Take exponential moving average (alpha = 1/8)
+        // Take exponential moving average (alpha = 1/8) to smooth the value
         can_bus_load_ppm = (can_bus_load_ppm * 7 + (uint32_t)CAN_BUS_LOAD_BUILDUP_PPM * rate_us_per_ms / 1000) >> 3;
 
         bit_cnt_message = 0;
@@ -686,7 +686,7 @@ void can_update_bit_time_ns(void)
     can_bit_time_ns = ((uint32_t)1 + can_bit_cfg_nominal.time_seg1 + can_bit_cfg_nominal.time_seg2);
     can_bit_time_ns = can_bit_time_ns * can_bit_cfg_nominal.prescaler;  // Tq in one bit
     can_bit_time_ns = can_bit_time_ns * 1000;                           // MAX: (1 + 256 + 128) * 1000
-    can_bit_time_ns = can_bit_time_ns / 80;                             // Clock: 80MHz = (80 / 1000) GHz
+    can_bit_time_ns = can_bit_time_ns / 80;                             // CAN clock: 80MHz = (80 / 1000) GHz TODO MAKE THIS A MACRO
 
     return;
 }
