@@ -39,8 +39,8 @@
 #define CAN_BIT_NBR_WOD_FXFF_DATA_L     30      // Bit number in data phase with longer crc
 
 // Parameter to calculate bus load
-#define CAN_BUS_LOAD_BUILDUP_PPM        1125000     /* Compensate stuff bits (10%) and round down (2.5%) in bus laod calc */
 #define CAN_ROOT_CLOCK_MHZ              80
+#define CAN_BUS_LOAD_BUILDUP_PPM        1125000     /* Compensate stuff bits (10%) and round down (2.5%) in bus laod calc */
 
 // Public variable
 uint8_t can_dlc_to_bytes[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 16, 20, 24, 32, 48, 64};

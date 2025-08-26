@@ -162,7 +162,7 @@ void buf_enqueue_cdc(uint8_t* buf, uint16_t len)
 }
 
 // Get destination pointer of cdc buffer for len bytes data (Start position of write access)
-// This function combined with buf_comit_cdc_dest will offer faster access compared to buf_enqueue_cdc.
+// This function combined with buf_comit_cdc_dest will provide a faster access compared to buf_enqueue_cdc.
 uint8_t *buf_get_cdc_dest(uint16_t len)
 {
     if (BUF_CDC_TX_BUF_SIZE < buf_cdc_tx.msglen[buf_cdc_tx.head] + len)
