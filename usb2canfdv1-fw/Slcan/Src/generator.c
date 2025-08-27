@@ -162,10 +162,10 @@ int32_t slcan_generate_rx_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_heade
     if (buf == NULL)
         return 0;
 
-    int32_t msg_len = slcan_generate_frame(buf, frame_header, frame_data);
+    int32_t len = slcan_generate_frame(buf, frame_header, frame_data);
 
     // Return string length
-    return msg_len;
+    return len;
 }
 
 // Parse an incoming Tx event into an outgoing slcan message
@@ -195,10 +195,10 @@ int32_t slcan_generate_tx_event(uint8_t *buf, FDCAN_TxEventFifoTypeDef *tx_event
     frame_header.BitRateSwitch = tx_event->BitRateSwitch;
     frame_header.FDFormat = tx_event->FDFormat;
     frame_header.RxTimestamp = tx_event->TxTimestamp;
-    int32_t msg_len = slcan_generate_frame(&buf[1], &frame_header, frame_data);
+    int32_t len = slcan_generate_frame(&buf[1], &frame_header, frame_data);
 
     // Return string length
-    return msg_len + 1;
+    return len + 1;
 }
 
 

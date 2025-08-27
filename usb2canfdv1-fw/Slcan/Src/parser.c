@@ -274,6 +274,7 @@ void slcan_parse_str(uint8_t *buf, uint8_t len)
     // If dlc is too long for a remote frame
     if  (frame_header->TxFrameType == FDCAN_REMOTE_FRAME)
     {
+        // See https://github.com/Nakakiyo092/canable2-fw/issues/67#issuecomment-3228730384 for the DLC range
         if  (0xF < dlc_code_raw)
         {
             buf_enqueue_cdc(SLCAN_RET_ERR, SLCAN_RET_LEN);
