@@ -300,7 +300,7 @@ void can_process(void)
     if (rx_err_cnt > can_error_state.rec || cnt.TxErrorCnt > can_error_state.tec)
         slcan_raise_error(SLCAN_STS_BUS_ERROR);
     if (sts.BusOff && !can_error_state.bus_off)     // If it gets bus off right now
-    	slcan_raise_error(SLCAN_STS_BUS_ERROR);     // capture counter increase that caused bus off
+    	slcan_raise_error(SLCAN_STS_BUS_ERROR);     // capture counter increase that caused bus off since it does not increase TxErrorCnt
 
     can_error_state.bus_off = (uint8_t)sts.BusOff;
     can_error_state.err_pssv = (uint8_t)sts.ErrorPassive;
@@ -312,6 +312,7 @@ void can_process(void)
         can_error_state.last_err_code = sts.LastErrorCode;
 
     // Check for bus error flags
+    // See https://github.com/Nakakiyo092/canable2-fw/issues/63 for the difference from the bus status
     if (__HAL_FDCAN_GET_FLAG(&hfdcan1, FDCAN_FLAG_ERROR_WARNING))
     {
         slcan_raise_error(SLCAN_STS_ERROR_WARNING);
