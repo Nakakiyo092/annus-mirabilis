@@ -307,7 +307,7 @@ void can_process(void)
     can_error_state.tec = (uint8_t)cnt.TxErrorCnt;
     can_error_state.rec = (uint8_t)rx_err_cnt;
 
-    // Check for error code (See https://github.com/Nakakiyo092/canable2-fw/issues/68 for mechanism)
+    // Check for error code (See https://github.com/Nakakiyo092/canable2-fw/issues/68 for the intended behavior)
     if (sts.DataLastErrorCode != FDCAN_PROTOCOL_ERROR_NONE && sts.DataLastErrorCode != FDCAN_PROTOCOL_ERROR_NO_CHANGE)
         can_error_state.last_err_code = sts.DataLastErrorCode;
     if (sts.LastErrorCode != FDCAN_PROTOCOL_ERROR_NONE && sts.LastErrorCode != FDCAN_PROTOCOL_ERROR_NO_CHANGE)
