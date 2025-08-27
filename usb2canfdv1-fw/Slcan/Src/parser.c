@@ -163,23 +163,10 @@ void slcan_parse_str(uint8_t *buf, uint8_t len)
     // Debug function
     case '?':
     {
-        //uint8_t cycle_ave = (uint8_t)(can_get_cycle_ave_time_ns() >= 255000 ? 255 : can_get_cycle_ave_time_ns() / 1000);
-        //uint8_t cycle_max = (uint8_t)(can_get_cycle_max_time_ns() >= 255000 ? 255 : can_get_cycle_max_time_ns() / 1000);
-        // "?XX-XX\r"
-        //uint8_t dbgstr[7];
-        //dbgstr[0] = '?';
-        //dbgstr[1] = slcan_nibble_to_ascii[cycle_ave >> 4];
-        //dbgstr[2] = slcan_nibble_to_ascii[cycle_ave & 0xF];
-        //dbgstr[3] = '-';
-        //dbgstr[4] = slcan_nibble_to_ascii[cycle_max >> 4];
-        //dbgstr[5] = slcan_nibble_to_ascii[cycle_max & 0xF];
-        //dbgstr[6] = '\r';
-
         uint8_t dbgstr[2];
         dbgstr[0] = '?';
         dbgstr[1] = '\r';
         buf_enqueue_cdc(dbgstr, strlen((char *)dbgstr));
-        can_clear_cycle_time();
         return;
     }
     default:

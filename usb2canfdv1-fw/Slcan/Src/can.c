@@ -653,6 +653,7 @@ FunctionalState can_is_tx_enabled(void)
 }
 
 // Return CAN bus load in ppm
+// The value is not accurate more than 100,000 points without considering stuff bits.
 // See https://github.com/Nakakiyo092/canable2-fw/issues/62 for some details of bus load calculation
 uint32_t can_get_bus_load_ppm(void)
 {

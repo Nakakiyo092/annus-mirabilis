@@ -35,6 +35,9 @@ uint16_t slcan_report_reg = 1;   // Default: no timestamp, no ESI, no Tx, but wi
 static int32_t slcan_generate_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, uint8_t *frame_data);
 
 // Generate a slcan message from a CAN frame
+// Returns number of bytes written into buf
+//  MIN: 1 (r) + SLCAN_STD_ID_LEN + 2 (DLC & [CR])
+//  MAX: SLCAN_MTU - 1 (z/Z) - 16 (padding)
 int32_t slcan_generate_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, uint8_t *frame_data)
 {
     // Start building the slcan message string at idx 0 in buf
@@ -147,6 +150,9 @@ int32_t slcan_generate_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, 
 }
 
 // Parse an incoming CAN frame into an outgoing slcan message
+// Returns number of bytes written into buf
+//  MIN: 1 (r) + SLCAN_STD_ID_LEN + 2 (DLC & [CR])
+//  MAX: SLCAN_MTU - 1 (z/Z) - 16 (padding)
 int32_t slcan_generate_rx_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_header, uint8_t *frame_data)
 {
     // Check if Rx reporting is required
@@ -156,13 +162,16 @@ int32_t slcan_generate_rx_frame(uint8_t *buf, FDCAN_RxHeaderTypeDef *frame_heade
     if (buf == NULL)
         return 0;
 
-    int32_t msg_idx = slcan_generate_frame(buf, frame_header, frame_data);
+    int32_t msg_len = slcan_generate_frame(buf, frame_header, frame_data);
 
     // Return string length
-    return msg_idx;
+    return msg_len;
 }
 
 // Parse an incoming Tx event into an outgoing slcan message
+// Returns number of bytes written into buf
+//  MIN: 1 (r) + SLCAN_STD_ID_LEN + 2 (DLC & [CR])
+//  MAX: SLCAN_MTU - 16 (padding)
 int32_t slcan_generate_tx_event(uint8_t *buf, FDCAN_TxEventFifoTypeDef *tx_event, uint8_t *frame_data)
 {
     // Check if Tx reporting is required
@@ -186,10 +195,10 @@ int32_t slcan_generate_tx_event(uint8_t *buf, FDCAN_TxEventFifoTypeDef *tx_event
     frame_header.BitRateSwitch = tx_event->BitRateSwitch;
     frame_header.FDFormat = tx_event->FDFormat;
     frame_header.RxTimestamp = tx_event->TxTimestamp;
-    int32_t msg_idx = slcan_generate_frame(&buf[1], &frame_header, frame_data);
+    int32_t msg_len = slcan_generate_frame(&buf[1], &frame_header, frame_data);
 
     // Return string length
-    return msg_idx + 1;
+    return msg_len + 1;
 }
 
 
