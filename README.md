@@ -1,46 +1,29 @@
-# WeActStudio.USB2CANFDV1
+# _Annus mirabilis_
 
-## SLCAN Protocol Description
+This project is derived from [usb2canfdv1](https://github.com/Nakakiyo092/usb2canfdv1) which was forked from [WeActStudio.USB2CANFDV1](https://github.com/WeActStudio/WeActStudio.USB2CANFDV1)
 
-Using the virtual serial, the command is as follows:
-- `O[CR]` - Opens the CAN channel
-- `C[CR]` - Closes the CAN channel
-- `S0[CR]` - Sets the nominal bit rate to 10k
-- `S1[CR]` - Sets the nominal bit rate to 20k
-- `S2[CR]` - Sets the nominal bit rate to 50k
-- `S3[CR]` - Sets the nominal bit rate to 100k
-- `S4[CR]` - Sets the nominal bit rate to 125k (default)
-- `S5[CR]` - Sets the nominal bit rate to 250k
-- `S6[CR]` - Sets the nominal bit rate to 500k
-- `S7[CR]` - Sets the nominal bit rate to 800k
-- `S8[CR]` - Sets the nominal bit rate to 1M
-- `sddxxyyzz[CR]` - Custom nominal bit rate (60MHz CAN clock)
-- `Y0[CR]` - Sets the CANFD data segment bit rate to 500k
-- `Y1[CR]` - Sets the CANFD data segment bit rate to 1M
-- `Y2[CR]` - Sets the CANFD data segment bit rate to 2M (default)
-- `Y3[CR]` - Sets the CANFD data segment bit rate to 3M
-- `Y4[CR]` - Sets the CANFD data segment bit rate to 4M
-- `Y5[CR]` - Sets the CANFD data segment bit rate to 5M
-- `yddxxyyzz[CR]` - Custom CANFD data segment bit rate (60MHhz CAN clock)
-- `tiiildd...[CR] `- Transmits data frame (standard ID) [ID, length, data]
-- `Tiiiiiiiildd...[CR] `- Transmits data frame (extended ID) [ID, length, data]
-- `riiil[CR]` - Transmits remote frame (standard ID) [ID, length]
-- `Riiiiiiiil[CR]` - Transmits remote frame (extended ID) [ID, length]
-- `diiildd...[CR] `- Transmits CANFD standard frames (without BRS enabled) [ID, length, data]
-- `Diiiiiiiildd...[CR] `- Transmits CANFD extended frames (without BRS enabled) [ID, length, data]
-- `biiildd...[CR] `- Transmits CANFD standard frames (BRS enabled) [ID, length, data]
-- `Biiiiiiiildd...[CR] `- Transmits CANFD extended frames (BRS enable) [ID, length, data]
-- `V[CR]` - Reads the firmware version
-- `X[CR]` - Enters firmware upgrade mode
+## Purpose
 
-`[CR]` : `0x0D` (hex), `\r` (ascii)
+This software was created to prove the ability to poll a CAN FD frame using a remote frame.
 
-Please find more information in the `doc` directory or the [wiki](https://github.com/Nakakiyo092/usb2canfdv1/wiki).
+## Usage
+
+- Setup this device and open the port following the method described in [this](https://github.com/Nakakiyo092/usb2canfdv1) project.
+
+- Connect CAN line to another device to communicate with this device.
+
+- Send a remote frame with CAN ID `0x19050630` and with DLC `0xC` (24 bytes) from the other device.
+
+- Confirm the following 24 bytes of data is received on the other device on the bus.
+
+    `HEX: 5A 75 72 20 45 6C 65 6B 74 72 6F 64 79 6E 61 6D 69 6B 20 62 65 77 65 67 74 65 72 20 4B 6F 65 72 70 65 72 00 00 00`
 
 ## How to compile firmware
+
 Use STM32CubeIDE 1.18.0 or later.
 
 ## How to upgrade firmware
+
 Use the upgrade tool in the [root repository](https://github.com/WeActStudio/WeActStudio.USB2CANFDV1).
 
 Note: After flashing this firmware, there would be an issue upgrading to another firmware.
