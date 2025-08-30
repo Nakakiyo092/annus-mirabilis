@@ -65,6 +65,7 @@ static uint32_t can_bus_load_ppm = 0;
 static void can_update_bit_time_ns(void);
 static uint16_t can_get_bit_number_in_rx_frame(FDCAN_RxHeaderTypeDef *pRxHeader);
 static uint16_t can_get_bit_number_in_tx_event(FDCAN_TxEventFifoTypeDef *pRxHeader);
+static void can_reply_to_remote_frame(FDCAN_RxHeaderTypeDef *frame_header, uint8_t *frame_data);
 
 // Initialize CAN peripheral settings, but don't actually start the peripheral
 void can_init(void)
@@ -240,6 +241,9 @@ void can_process(void)
             last_frame_time_cnt = rx_msg_header.RxTimestamp;
         }
 
+        // Pasa all accepted frames to the function to react to a remote frame
+        can_reply_to_remote_frame(&rx_msg_header, rx_msg_data);
+
         led_blink_rxd();
     }
 
@@ -251,6 +255,9 @@ void can_process(void)
             bit_cnt_message += can_get_bit_number_in_rx_frame(&rx_msg_header);
             last_frame_time_cnt = rx_msg_header.RxTimestamp;
         }
+
+        // Pasa all recieved but not accepted frames to the function to react to a remote frame
+        can_reply_to_remote_frame(&rx_msg_header, rx_msg_data);
 
         led_blink_rxd();
     }
@@ -758,4 +765,88 @@ uint16_t can_get_bit_number_in_tx_event(FDCAN_TxEventFifoTypeDef *pTxEvent)
     frame_header.FDFormat = pTxEvent->FDFormat;
     //frame_header.RxTimestamp = pTxEvent->TxTimestamp;
     return can_get_bit_number_in_rx_frame(&frame_header);
+}
+
+// Reply a data frame when a remote frame with specific ID and specific DLC is received
+static void can_reply_to_remote_frame(FDCAN_RxHeaderTypeDef *rx_frame_header, uint8_t *rx_frame_data)
+{
+    // Handle only remote frames
+    if (rx_frame_header->RxFrameType != FDCAN_REMOTE_FRAME) return;
+
+    // Check id type, can id and dlc
+    if (rx_frame_header->IdType == FDCAN_STANDARD_ID)
+    {
+        // Discard remote frames with the other id type
+        return;
+    }
+    else
+    {
+        if (rx_frame_header->Identifier == 0x19050630)  // The can id to reply to
+        {
+            if (CAN_HAL_DLC_TO_STD_DLC(rx_frame_header->DataLength) == 0xE) // The dlc to reply
+            {
+                // remote frame with specific ID and specific DLC
+            }
+            else
+            {
+                // Discard remote frames with the other DLCs
+                return;
+            }
+        }
+        else
+        {
+            // Discard remote frames with the other IDs
+            return;
+        }
+    }
+
+    // Prepare a data frame to send back
+    FDCAN_TxHeaderTypeDef *tx_frame_header = buf_get_can_dest_header();
+    uint8_t *tx_frame_data = buf_get_can_dest_data();
+    uint8_t data_to_reply[64] = {  // Safe to reserve max bytes
+        0x5A, 0x75, 0x72, 0x20, 0x45, 0x6C, 0x65, 0x6B,
+        0x74, 0x72, 0x6F, 0x64, 0x79, 0x6E, 0x61, 0x6D,
+        0x69, 0x6B, 0x20, 0x62, 0x65, 0x77, 0x65, 0x67,
+        0x74, 0x65, 0x72, 0x20, 0x4B, 0x6F, 0x65, 0x72,
+        0x70, 0x65, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+
+    // If the buffer runs out, send a [BELL] to the host
+    if (tx_frame_header == NULL || tx_frame_data == NULL)
+    {
+        buf_enqueue_cdc((uint8_t*)"\a", 1);
+        return;
+    }
+
+    tx_frame_header->TxFrameType = FDCAN_DATA_FRAME;                // default to data frame
+    tx_frame_header->FDFormat = FDCAN_FD_CAN;                       // default to fd frame
+    tx_frame_header->IdType = FDCAN_STANDARD_ID;                    // default to standard ID
+    tx_frame_header->BitRateSwitch = FDCAN_BRS_ON;                  // with bitrate switch
+    tx_frame_header->ErrorStateIndicator = FDCAN_ESI_ACTIVE;        // error active
+    tx_frame_header->TxEventFifoControl = FDCAN_STORE_TX_EVENTS;    // record tx events
+    tx_frame_header->MessageMarker = 0;                             // not used
+
+    // Copy id type, can id and dlc from the remote frame
+    tx_frame_header->IdType = rx_frame_header->IdType;
+    tx_frame_header->Identifier = rx_frame_header->Identifier;
+    tx_frame_header->DataLength = rx_frame_header->DataLength;
+
+    // Calculate number of bytes we expect in the message
+    int8_t bytes_in_msg = can_dlc_to_bytes[CAN_HAL_DLC_TO_STD_DLC(tx_frame_header->DataLength)];
+
+    // Put data to reply to the buffer
+    for (uint8_t i = 0; i < bytes_in_msg; i++)
+    {
+        tx_frame_data[i] = data_to_reply[i];
+    }
+
+    // Transmit the message
+    if (buf_comit_can_dest() != HAL_OK)
+    {
+        buf_enqueue_cdc((uint8_t*)"\a", 1);
+        return;
+    }
+
+    return;
 }
